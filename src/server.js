@@ -5,10 +5,6 @@ import { connectDB } from "./db/db.js";
 import productRoutes from "./routes/products.js";
 import cookieParser from "cookie-parser";
 
-app.get("/read-cookie", (req, res) => {
-  res.send(`Theme: ${req.cookies.theme}`);
-});
-
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -21,7 +17,10 @@ app.use(cookieParser());
 
 app.get("/set-cookie", (req, res) => {
   res.cookie("theme", "dark");
-  res.send("Cookie set");
+});
+
+app.get("/read-cookie", (req, res) => {
+  res.send(`Theme: ${req.cookies.theme}`);
 });
 
 app.use("/products", productRoutes);
