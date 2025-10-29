@@ -5,6 +5,7 @@ const router = express.Router();
 
 // GET /products (list all)
 router.get("/", async (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running" });
   const result = await pool.query("SELECT * FROM products;");
   res.json(result.rows);
 });
