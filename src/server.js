@@ -13,16 +13,6 @@ app.get("/", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is running" });
 });
 
-app.use(cookieParser());
-
-app.get("/set-cookie", (req, res) => {
-  res.cookie("theme", "dark");
-});
-
-app.get("/read-cookie", (req, res) => {
-  res.send(`Theme: ${req.cookies.theme}`);
-});
-
 app.use("/products", productRoutes);
 // Connect to database on server start
 if (process.env.NODE_ENV !== "test") {
@@ -36,5 +26,15 @@ if (process.env.NODE_ENV !== "test") {
     process.exit(1);
   }
 }
+
+app.use(cookieParser());
+
+app.get("/set-cookie", (req, res) => {
+  res.cookie("theme", "dark");
+});
+
+app.get("/read-cookie", (req, res) => {
+  res.send(`Theme: ${req.cookies.theme}`);
+});
 
 export default app;
