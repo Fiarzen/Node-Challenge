@@ -8,21 +8,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
-app.use(express.json());
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running" });
+});
 
+app.use("/products", productRoutes);
 // Connect to database on server start
-try {
-  await connectDB();
-  app.get("/", (req, res) => {
-    res.status(200).json({ status: "ok", message: "Server is running" });
-  });
-
-  app.use("/products", productRoutes);
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-} catch (error) {
-  console.log(`Server failed to start: ${error}`);
-  process.exit(1);
+if (process.env.NODE_ENV !== "test") {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(`Server failed to start: ${error}`);
+    process.exit(1);
+  }
 }
+
+export default app;
