@@ -14,6 +14,10 @@ app.use(express.json());
 // Connect to database on server start
 try {
   await connectDB();
+  app.get("/", (req, res) => {
+    res.status(200).json({ status: "ok", message: "Server is running" });
+  });
+
   app.use("/products", productRoutes);
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
