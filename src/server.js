@@ -17,5 +17,5 @@ connectDB();
 app.use("/products", productRoutes);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
