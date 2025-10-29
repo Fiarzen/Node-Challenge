@@ -12,10 +12,13 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to database on server start
-connectDB();
-
-app.use("/products", productRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+try {
+  await connectDB();
+  app.use("/products", productRoutes);
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+} catch (error) {
+  console.log(`Server failed to start: ${error}`);
+  process.exit(1);
+}
