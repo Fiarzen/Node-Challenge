@@ -5,7 +5,7 @@
     "buildCommand": "echo building!"
     },
   "deploy": {
-    "preDeployCommand": ["npm run db:start"],
+    "preDeployCommand": ["npm run start"],
     "startCommand": "echo starting!",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,
