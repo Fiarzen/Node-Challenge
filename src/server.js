@@ -4,11 +4,30 @@ import dotenv from "dotenv";
 import { connectDB } from "./db/db.js";
 import productRoutes from "./routes/products.js";
 import cookieParser from "cookie-parser";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// OpenAPI config
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.3",
+    info: {
+      title: "Products API",
+      version: "1.0.0",
+      description:
+        "CRUD API for managing products with pagination and filtering",
+    },
+    servers: [{ url: "http://localhost:4000/api/products" }],
+  },
+  apis: ["./routes/*.js"], // Path to your route files
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Global middlewares
 app.use(cors());
 app.use(cookieParser());
@@ -44,7 +63,8 @@ app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || 500;
   const payload = {
     error: err.name || "Error",
-    message: err.message || (status === 500 ? "Internal Server Error" : undefined),
+    message:
+      err.message || (status === 500 ? "Internal Server Error" : undefined),
   };
   if (err.errors && typeof err.errors === "object") {
     payload.errors = err.errors;
