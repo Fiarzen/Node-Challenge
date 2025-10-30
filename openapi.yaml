@@ -62,7 +62,7 @@ paths:
         "200":
           description: A paginated list of products
           content:
-            application/json:
+            json:
               schema:
                 type: object
                 properties:
@@ -93,14 +93,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          json:
             schema:
               $ref: "#/components/schemas/NewProduct"
       responses:
         "201":
           description: Product created
           content:
-            application/json:
+            json:
               schema:
                 $ref: "#/components/schemas/Product"
         "422":
@@ -119,7 +119,7 @@ paths:
         "200":
           description: Product found
           content:
-            application/json:
+            json:
               schema:
                 $ref: "#/components/schemas/Product"
         "404":
@@ -138,14 +138,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          json:
             schema:
               $ref: "#/components/schemas/UpdateProduct"
       responses:
         "200":
           description: Updated product
           content:
-            application/json:
+            json:
               schema:
                 $ref: "#/components/schemas/Product"
         "404":
