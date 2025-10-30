@@ -10,7 +10,7 @@ tags:
   - name: Products
     description: Product management endpoints
 paths:
-  /:
+  /products:
     get:
       summary: List all products
       tags: [Products]
@@ -105,7 +105,7 @@ paths:
                 $ref: "#/components/schemas/Product"
         "422":
           description: Validation failed
-  /{id}:
+  /products/{id}:
     get:
       summary: Get a product by ID
       tags: [Products]
