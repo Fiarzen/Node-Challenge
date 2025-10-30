@@ -4,10 +4,8 @@ info:
   description: CRUD API for managing products with pagination, filtering, and validation.
   version: 1.0.0
 servers:
-  - url: https://your-app-name.up.railway.app/api/products
+  - url: https://node-challenge-production.up.railway.app
     description: Production (Railway)
-  - url: http://localhost:3000/api/products
-    description: Local development
 tags:
   - name: Products
     description: Product management endpoints
