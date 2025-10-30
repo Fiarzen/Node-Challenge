@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: Products API
+  description: CRUD API for managing products with pagination, filtering, and validation.
+  version: 1.0.0
+servers:
+  - url: https://your-app-name.up.railway.app/api/products
+    description: Production (Railway)
+  - url: http://localhost:3000/api/products
+    description: Local development
+tags:
+  - name: Products
+    description: Product management endpoints
+paths:
+  /:
+    get:
+      summary: List all products
+      tags: [Products]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number (1-based)
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filter by name substring (case-insensitive)
+        - name: min_price
+          in: query
+          schema:
+            type: number
+            minimum: 0
+          description: Minimum product price
+        - name: max_price
+          in: query
+          schema:
+            type: number
+            minimum: 0
+          description: Maximum product price
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [id, name, price]
+          description: Field to sort by
+        - name: sort_dir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction
+      responses:
+        "200":
+          description: A paginated list of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+                  meta:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+                      sort_by:
+                        type: string
+                      sort_dir:
+                        type: string
+        "422":
+          description: Validation failed
+    post:
+      summary: Create a new product
+      tags: [Products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewProduct"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "422":
+          description: Validation failed
+  /{id}:
+    get:
+      summary: Get a product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+        "422":
+          description: Invalid ID
+    patch:
+      summary: Update a product (partial)
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProduct"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+        "422":
+          description: Validation failed
+    delete:
+      summary: Delete a product
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Product deleted successfully
+        "404":
+          description: Product not found
+        "422":
+          description: Invalid ID
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+    NewProduct:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        price:
+          type: number
+          minimum: 0
+          format: float
+    UpdateProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        price:
+          type: number
+          minimum: 0
+          format: float

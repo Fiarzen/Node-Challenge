@@ -6,28 +6,16 @@ import productRoutes from "./routes/products.js";
 import cookieParser from "cookie-parser";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // OpenAPI config
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.3",
-    info: {
-      title: "Products API",
-      version: "1.0.0",
-      description:
-        "CRUD API for managing products with pagination and filtering",
-    },
-    servers: [{ url: "http://localhost:4000/api/products" }],
-  },
-  apis: ["./routes/*.js"], // Path to your route files
-};
+const swaggerDocument = YAML.load("./openapi.yaml");
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Global middlewares
 app.use(cors());
 app.use(cookieParser());
