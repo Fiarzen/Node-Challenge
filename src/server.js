@@ -9,32 +9,74 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Global middlewares
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
+
+// Health check
 app.get("/", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is running" });
 });
 
-app.use("/products", productRoutes);
-// Connect to database on server start
-if (process.env.NODE_ENV !== "test") {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error(`Server failed to start: ${error}`);
-    process.exit(1);
-  }
-}
-
-app.use(cookieParser());
-
+// Demo cookie endpoints
 app.get("/set-cookie", (req, res) => {
   res.cookie("theme", "dark");
+  res.status(204).send();
 });
 
 app.get("/read-cookie", (req, res) => {
   res.send(`Theme: ${req.cookies.theme}`);
 });
+
+// Routes
+app.use("/products", productRoutes);
+
+// 404 for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({ error: "Not Found" });
+});
+
+// Error handling middleware
+// Converts thrown/rejected errors into JSON consistently
+// Accepts optional shape: { status|statusCode, message, errors }
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  const payload = {
+    error: err.name || "Error",
+    message: err.message || (status === 500 ? "Internal Server Error" : undefined),
+  };
+  if (err.errors && typeof err.errors === "object") {
+    payload.errors = err.errors;
+  }
+  if (status >= 500) {
+    // Ensure visibility of unexpected errors without crashing process
+    console.error("Unhandled error:", err);
+  }
+  res.status(status).json(payload);
+});
+
+// Global process-level guards so unhandled errors don't crash the process
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Promise Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+// Connect to database on server start (skipped in tests)
+if (process.env.NODE_ENV !== "test") {
+  (async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    } catch (error) {
+      console.error(`Server failed to start: ${error}`);
+      // Do not crash, but expose visibility
+    }
+  })();
+}
 
 export default app;
